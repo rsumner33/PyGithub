@@ -2,10 +2,8 @@
 
 ############################ Copyrights and license ############################
 #                                                                              #
-# Copyright 2013 Vincent Jacques <vincent@vincent-jacques.net>                 #
-# Copyright 2014 Vincent Jacques <vincent@vincent-jacques.net>                 #
-# Copyright 2016 Peter Buckley <dx-pbuckley@users.noreply.github.com>          #
-# Copyright 2018 Wan Liuyang <tsfdye@gmail.com>                                #
+# Copyright 2017 Aaron Levine <allevin@sandia.gov>                             #
+# Copyright 2017 Simon <spam@esemi.ru>                                         #
 # Copyright 2018 sfdye <tsfdye@gmail.com>                                      #
 #                                                                              #
 # This file is part of PyGithub.                                               #
@@ -26,28 +24,22 @@
 #                                                                              #
 ################################################################################
 
-import github.GithubObject
-
-import github.NamedUser
+import Framework
 
 
-class StatsPunchCard(github.GithubObject.NonCompletableGithubObject):
-    """
-    This class represents StatsPunchCards. The reference can be found here http://developer.github.com/v3/repos/statistics/#get-the-number-of-commits-per-hour-in-each-day
-    """
+class PullRequestReviewerRequests(Framework.TestCase):
+    def setUp(self):
+        Framework.TestCase.setUp(self)
+        self.repo = self.g.get_repo("PyGithub/PyGithub")
+        self.pull = self.repo.get_pull(538)
 
-    def get(self, day, hour):
-        """
-        Get a specific element
-        :param day: int
-        :param hour: int
-        :rtype: int
-        """
-        return self._dict[(day, hour)]
+        self.pullreviewerrequests = self.pull.get_reviewer_requests()
+        self.pullreviewerrequest = self.pullreviewerrequests[0]
 
-    def _initAttributes(self):
-        self._dict = {}
+    def testAttributes(self):
 
-    def _useAttributes(self, attributes):
-        for day, hour, commits in attributes:
-            self._dict[(day, hour)] = commits
+        self.assertEqual(self.pullreviewerrequest.id, 2930472)
+        self.assertEqual(self.pullreviewerrequest.login, "jayfk")
+
+        # test __repr__() based on this attributes
+        self.assertEqual(self.pullreviewerrequest.__repr__(), 'PullRequestReviewerRequest(login="jayfk", id=2930472)')

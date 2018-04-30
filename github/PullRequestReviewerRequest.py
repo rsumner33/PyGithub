@@ -2,9 +2,7 @@
 
 ############################ Copyrights and license ############################
 #                                                                              #
-# Copyright 2013 Vincent Jacques <vincent@vincent-jacques.net>                 #
-# Copyright 2014 Vincent Jacques <vincent@vincent-jacques.net>                 #
-# Copyright 2016 Peter Buckley <dx-pbuckley@users.noreply.github.com>          #
+# Copyright 2017 Aaron Levine <allevin@sandia.gov>                             #
 # Copyright 2018 Wan Liuyang <tsfdye@gmail.com>                                #
 # Copyright 2018 sfdye <tsfdye@gmail.com>                                      #
 #                                                                              #
@@ -31,23 +29,36 @@ import github.GithubObject
 import github.NamedUser
 
 
-class StatsPunchCard(github.GithubObject.NonCompletableGithubObject):
+class PullRequestReviewerRequest(github.GithubObject.CompletableGithubObject):
     """
-    This class represents StatsPunchCards. The reference can be found here http://developer.github.com/v3/repos/statistics/#get-the-number-of-commits-per-hour-in-each-day
+    This class represents PullRequestReviewerRequests. The reference can be found here https://developer.github.com/v3/pulls/review_requests/
     """
 
-    def get(self, day, hour):
+    def __repr__(self):
+        return self.get__repr__({"id": self._id.value, "login": self._login.value})
+
+    @property
+    def login(self):
         """
-        Get a specific element
-        :param day: int
-        :param hour: int
-        :rtype: int
+        :type: string
         """
-        return self._dict[(day, hour)]
+        self._completeIfNotSet(self._login)
+        return self._login.value
+
+    @property
+    def id(self):
+        """
+        :type: integer
+        """
+        self._completeIfNotSet(self._id)
+        return self._id.value
 
     def _initAttributes(self):
-        self._dict = {}
+        self._login = github.GithubObject.NotSet
+        self._id = github.GithubObject.NotSet
 
     def _useAttributes(self, attributes):
-        for day, hour, commits in attributes:
-            self._dict[(day, hour)] = commits
+        if "login" in attributes:  # pragma no branch
+            self._login = self._makeStringAttribute(attributes["login"])
+        if "id" in attributes:  # pragma no branch
+            self._id = self._makeIntAttribute(attributes["id"])
